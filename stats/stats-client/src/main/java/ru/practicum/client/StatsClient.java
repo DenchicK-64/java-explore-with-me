@@ -12,8 +12,9 @@ import ru.practicum.dto.EndpointHitDto;
 import java.util.Map;
 
 @Service
-public class StatsClient extends BaseClient{
+public class StatsClient extends BaseClient {
     private static final String STATS_SERVER_URL = "http://stats-server:9090";
+
     @Autowired
     public StatsClient(@Value(STATS_SERVER_URL) String serverUrl, RestTemplateBuilder builder) {
         super(
