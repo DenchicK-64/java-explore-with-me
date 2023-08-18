@@ -32,7 +32,7 @@ public class StatsController {
     @ResponseStatus(HttpStatus.OK)
     public List<ViewStatsDto> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
                                        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
-                                       @RequestParam(required = false) List<String> uris,
+                                       @RequestParam(required = false) String[] uris,
                                        @RequestParam(defaultValue = "false") boolean unique) {
         log.info("Получение статистики по посещениям." +
                 " Дата и впемя начала диапозона, за который нужно выгрузить статистику = " + start +

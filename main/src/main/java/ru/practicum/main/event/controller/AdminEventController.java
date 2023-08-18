@@ -13,7 +13,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -25,13 +24,13 @@ public class AdminEventController {
 
     @GetMapping()
     public List<EventFullDto> getEventsByAdmin(@RequestParam(required = false) List<Long> users,
-                                                     @RequestParam(required = false) List<EventState> states,
-                                                     @RequestParam(required = false) List<Long> categories,
-                                                     @RequestParam(required = false)
-                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-                                                     @RequestParam(required = false)
-                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
-                                                     @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                               @RequestParam(required = false) List<EventState> states,
+                                               @RequestParam(required = false) List<Long> categories,
+                                               @RequestParam(required = false)
+                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                               @RequestParam(required = false)
+                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+                                               @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Получение полной информации обо всех событиях, подходящих под переданные условия");
         return eventService.getEventsByAdmin(users, states, categories, rangeStart, rangeEnd, from, size);

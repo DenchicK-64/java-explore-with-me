@@ -4,8 +4,6 @@ import lombok.*;
 
 @Getter
 @Setter
-/*@AllArgsConstructor*/
-/*@NoArgsConstructor*/
 @Builder
 public class ViewStatsDto {
     private String app;

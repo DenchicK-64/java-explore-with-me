@@ -33,17 +33,6 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
     }
-    /*@ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleOperationAccessException(final OperationAccessException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleNotAvailableException(final NotAvailableException e) {
-        return new ErrorResponse(e.getMessage());
-    }*/
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)

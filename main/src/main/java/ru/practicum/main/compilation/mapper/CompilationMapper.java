@@ -3,11 +3,9 @@ package ru.practicum.main.compilation.mapper;
 import ru.practicum.main.compilation.dto.CompilationDto;
 import ru.practicum.main.compilation.dto.NewCompilationDto;
 import ru.practicum.main.compilation.model.Compilation;
-import ru.practicum.main.event.dto.EventShortDto;
 import ru.practicum.main.event.mapper.EventMapper;
 import ru.practicum.main.event.model.Event;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,12 +17,6 @@ public class CompilationMapper {
                 .pinned(compilation.getPinned())
                 .title(compilation.getTitle())
                 .build();
-        /*return CompilationDto.builder()
-                .id(compilation.getId())
-                .title(compilation.getTitle())
-                .pinned(compilation.getPinned())
-                .events(compilation.getEvents().stream().map(EventMapper::toEventShortDto).collect(Collectors.toList()))
-                .build();*/
     }
 
     public static Compilation toCompilation(NewCompilationDto newCompilationDto, Set<Event> events) {

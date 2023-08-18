@@ -32,7 +32,7 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
         if (start.isAfter(end)) {
             throw new ValidationException("Дата конца периода поиска не может быть раньше даты начала поиска и дата начала периода " +
                     "поиска не может быть позже даты конца периода поиска");

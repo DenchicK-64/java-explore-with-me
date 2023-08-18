@@ -130,21 +130,14 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getOneEventByInitiator(Long userId, Long eventId) {
         Event event = checkEvent(userId, eventId);
-        /*List<Long> ids = List.of(eventId);
-        Map<Long, Long> views = getViewsFromStats(List.of(event));*/
-        EventFullDto eventFullDto = toEventFullDto(event);
-        /*eventFullDto.setViews(views.getOrDefault(eventId, 0L));*/
-        return eventFullDto;
+        return toEventFullDto(event);
     }
 
     @Override
     public List<EventShortDto> findAllOwnEventsByInitiator(Long userId, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findAllByInitiatorId(userId, pageRequest);
-        /*List<Long> ids = events.stream().map(Event::getId).collect(Collectors.toList());
-        Map<Long, Long> views = getViewsFromStats(events);*/
         return events.stream().map(EventMapper::toEventShortDto)
-                /*.peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L)))*/
                 .collect(Collectors.toList());
     }
 
@@ -281,21 +274,13 @@ public class EventServiceImpl implements EventService {
         if (!event.getState().equals(EventState.PUBLISHED)) {
             throw new NotFoundException("Событие не опубликовано");
         }
-        /*event.setViews(event.getViews() + 1);
-        eventRepository.save(event);*/
-        /*increaseViews(Collections.singletonList(event), httpRequest);
-        log.info("Event.getViews = " + event.getViews());*/
         addHitToStats(httpRequest);
-        /*List<Long> ids = List.of(id);*/
         List<Event> events = List.of(event);
         Map<Long, Long> views = getViewsFromStats(events);
         log.info("Содержимое Map<Long, Long> views: " + views);
-        /*increaseViews(List.of(event), httpRequest);*/
         event.setViews(views.getOrDefault(id, 0L));
         eventRepository.save(event);
         EventFullDto eventFullDto = toEventFullDto(event);
-        /*eventFullDto.setViews(views.getOrDefault(id, 0L));*/
-        /*eventFullDto.setConfirmedRequests(requestRepository.countByEventIdAndStatus(id, RequestStatus.CONFIRMED));*/
         log.info("EventFullDto =" + eventFullDto.getViews());
         return eventFullDto;
     }
@@ -324,11 +309,8 @@ public class EventServiceImpl implements EventService {
         if (onlyAvailable) {
             events = eventRepository.getAvailableEventsWithoutSorting(text, categories, paid, rangeStart, rangeEnd, pageRequest);
             addHitToStats(httpRequest);
-            /*List<Long> ids = events.stream().map(Event::getId).collect(Collectors.toList());*/
             Map<Long, Long> views = getViewsFromStats(events);
             log.info("VIEWS:" + views);
-
-            /*increaseViews(events, httpRequest);*/
             if (sort == null) {
                 List<EventShortDto> dtos = events.stream()
                         .peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L)))
@@ -361,8 +343,6 @@ public class EventServiceImpl implements EventService {
         } else {
             events = eventRepository.getAllEvents(text, categories, paid, rangeStart, rangeEnd, pageRequest);
             addHitToStats(httpRequest);
-            /*increaseViews(events, httpRequest);*/
-            /*List<Long> ids = events.stream().map(Event::getId).collect(Collectors.toList());*/
             Map<Long, Long> views = getViewsFromStats(events);
             log.info("VIEWS:" + views);
             if (sort == null) {
@@ -433,15 +413,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private void increaseViews(List<Event> events, HttpServletRequest httpRequest) {
-        addHitToStats(httpRequest);
-        for (Event event : events) {
-            event.setViews(event.getViews() + 1L);
-            eventRepository.save(event);
-        }
-        eventRepository.saveAll(events);
-    }
-
     private void addHitToStats(HttpServletRequest httpRequest) {
         EndpointHitDto endpointHitDto = new EndpointHitDto();
         endpointHitDto.setApp("main");
@@ -453,22 +424,19 @@ public class EventServiceImpl implements EventService {
 
     private Map<Long, Long> getViewsFromStats(List<Event> events) {
         List<Long> ids = events.stream().map(Event::getId).collect(Collectors.toList());
-        /*if (events.size() > 1) {
-            events = events.stream().sorted(Comparator.comparing(Event::getPublishedOn).reversed()).collect(Collectors.toList());
-        }*/
-            String eventsUri = "/events/";
-            List<String> uriList = ids.stream().map(id -> eventsUri + id).collect(Collectors.toList());
-            ResponseEntity<Object> objects = statsClient.getStats(DEFAULT_START_SEARCH_TIME, DEFAULT_END_SEARCH_TIME, uriList, true);
-            List<ViewStatsDto> viewStatsDtoList =objectMapper.readValue(objects.getBody().toString(), new TypeReference<List<ViewStatsDto>>() {
-            });
+        String eventsUri = "/events/";
+        String[] uris = ids.stream().map(id -> eventsUri + id).toArray(String[]::new);
+        ResponseEntity<Object> objects = statsClient.getStats(DEFAULT_START_SEARCH_TIME, DEFAULT_END_SEARCH_TIME, uris, true);
+        List<ViewStatsDto> viewStatsDtoList = objectMapper.convertValue(objects.getBody(), new TypeReference<List<ViewStatsDto>>() {
+        });
         Map<Long, Long> views = new HashMap<>();
-            for (ViewStatsDto viewStatDto : viewStatsDtoList) {
-                String uri = viewStatDto.getUri();
-                String[] split = uri.split("/");
-                String str = split[2];
-                Long id = Long.parseLong(str);
-                views.put(id, viewStatDto.getHits());
-            }
-            return views;
+        for (ViewStatsDto viewStatDto : viewStatsDtoList) {
+            String uri = viewStatDto.getUri();
+            String[] split = uri.split("/");
+            String str = split[2];
+            Long id = Long.parseLong(str);
+            views.put(id, viewStatDto.getHits());
+        }
+        return views;
     }
 }

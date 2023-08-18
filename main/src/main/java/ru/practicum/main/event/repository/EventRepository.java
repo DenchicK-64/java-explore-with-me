@@ -54,9 +54,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "(e.eventDate BETWEEN :rangeStart AND :rangeEnd) AND " +
             "e.participantLimit > e.confirmedRequests OR e.participantLimit = 0")
     List<Event> getAvailableEventsWithoutSorting(@Param("text") String text,
-                                   @Param("categories") List<Long> categories,
-                                   @Param("paid") Boolean paid,
-                                   @Param("rangeStart") LocalDateTime rangeStart,
-                                   @Param("rangeEnd") LocalDateTime rangeEnd,
-                                   PageRequest pageRequest);
+                                                 @Param("categories") List<Long> categories,
+                                                 @Param("paid") Boolean paid,
+                                                 @Param("rangeStart") LocalDateTime rangeStart,
+                                                 @Param("rangeEnd") LocalDateTime rangeEnd,
+                                                 PageRequest pageRequest);
 }

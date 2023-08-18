@@ -38,9 +38,6 @@ public class CompilationServiceImpl implements CompilationService {
             events = eventRepository.findAllByIdIn(newCompilationDto.getEvents());
         }
         Compilation compilation = toCompilation(newCompilationDto, events);
-        /*if (compilation.getPinned() == null) {
-            compilation.setPinned(false);
-        }*/
         Compilation newCompilation = compilationRepository.save(compilation);
         CompilationDto compilationDto = toCompilationDto(newCompilation);
         return compilationDto;
@@ -72,11 +69,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public List<CompilationDto> findAll(Boolean pinned, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
-        /*if (pinned == null) {
-            return compilationRepository.findAll(pageRequest).stream().map(CompilationMapper::toCompilationDto).collect(Collectors.toList());
-        } else {*/
-            return compilationRepository.findAllByPinned(pinned, pageRequest).stream().map(CompilationMapper::toCompilationDto).collect(Collectors.toList());
-        /*}*/
+        return compilationRepository.findAllByPinned(pinned, pageRequest).stream().map(CompilationMapper::toCompilationDto).collect(Collectors.toList());
     }
 
     @Override
