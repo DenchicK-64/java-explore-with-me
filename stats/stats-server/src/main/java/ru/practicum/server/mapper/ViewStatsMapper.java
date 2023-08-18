@@ -23,9 +23,9 @@ public class ViewStatsMapper {
                 .build();
     }
 
-    public static List<ViewStatsDto> listToDto(List<ViewStats> list) {
-        if (!list.isEmpty()) {
-            return list.stream()
+    public static List<ViewStatsDto> listToDto(List<ViewStats> viewStatsList) {
+        if (!viewStatsList.isEmpty()) {
+            return viewStatsList.stream()
                     .map(ViewStatsMapper::toViewStatsDto)
                     .collect(Collectors.toList());
         }
