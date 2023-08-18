@@ -59,9 +59,8 @@ public class EventServiceImpl implements EventService {
     private final RequestRepository requestRepository;
     private final LocationRepository locationRepository;
     private final StatsClient statsClient;
-    LocalDateTime DEFAULT_START_SEARCH_TIME = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
-    LocalDateTime DEFAULT_END_SEARCH_TIME = LocalDateTime.of(2222, 1, 1, 1, 1, 1);
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    LocalDateTime DEFAULT_START_SEARCH_TIME = LocalDateTime.now().minusYears(50);
+    LocalDateTime DEFAULT_END_SEARCH_TIME = LocalDateTime.now().plusYears(1000);
     private final ObjectMapper objectMapper;
 
     /*PRIVATE*/
