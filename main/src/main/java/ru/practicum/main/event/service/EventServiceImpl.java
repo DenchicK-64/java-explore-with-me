@@ -59,8 +59,6 @@ public class EventServiceImpl implements EventService {
     private final RequestRepository requestRepository;
     private final LocationRepository locationRepository;
     private final StatsClient statsClient;
-    LocalDateTime DEFAULT_START_SEARCH_TIME = LocalDateTime.now().minusYears(50);
-    LocalDateTime DEFAULT_END_SEARCH_TIME = LocalDateTime.now().plusYears(1000);
     private final ObjectMapper objectMapper;
 
     /*PRIVATE*/
@@ -251,10 +249,10 @@ public class EventServiceImpl implements EventService {
         }
         PageRequest pageRequest = PageRequest.of(from, size);
         if (rangeStart == null) {
-            rangeStart = DEFAULT_START_SEARCH_TIME;
+            rangeStart = LocalDateTime.now().minusYears(50);
         }
         if (rangeEnd == null) {
-            rangeEnd = DEFAULT_END_SEARCH_TIME;
+            rangeEnd = LocalDateTime.now().plusYears(1000);
         }
         List<Event> events = eventRepository.getEventsByAdmin(users, states, categories, rangeStart, rangeEnd, pageRequest);
         log.info("getEventsByAdmin: " + events);
@@ -298,10 +296,10 @@ public class EventServiceImpl implements EventService {
             categories = categoryRepository.findAll().stream().map(Category::getId).collect(Collectors.toList());
         }
         if (rangeStart == null) {
-            rangeStart = DEFAULT_START_SEARCH_TIME;
+            rangeStart = LocalDateTime.now().minusYears(50);
         }
         if (rangeEnd == null) {
-            rangeEnd = DEFAULT_END_SEARCH_TIME;
+            rangeEnd = LocalDateTime.now().plusYears(1000);
         }
         log.info("pageRequest=" + pageRequest);
         List<Event> events;
@@ -309,11 +307,11 @@ public class EventServiceImpl implements EventService {
             events = eventRepository.getAvailableEventsWithoutSorting(text, categories, paid, rangeStart, rangeEnd, pageRequest);
             addHitToStats(httpRequest);
             Map<Long, Long> views = getViewsFromStats(events);
+            events = events.stream().peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L))).collect(Collectors.toList());
+            eventRepository.saveAll(events);
             log.info("VIEWS:" + views);
             if (sort == null) {
                 List<EventShortDto> dtos = events.stream()
-                        .peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L)))
-                        .peek(eventRepository::save)
                         .map(EventMapper::toEventShortDto)
                         .collect(Collectors.toList());
                 log.info("dtos.size() =" + dtos.size() + ". First:" + dtos.get(0));
@@ -321,8 +319,6 @@ public class EventServiceImpl implements EventService {
             }
             if (sort.equals(EventSort.VIEWS)) {
                 List<EventShortDto> dtos = events.stream()
-                        .peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L)))
-                        .peek(eventRepository::save)
                         .sorted(Comparator.comparing(Event::getViews))
                         .map(EventMapper::toEventShortDto)
                         .collect(Collectors.toList());
@@ -331,8 +327,6 @@ public class EventServiceImpl implements EventService {
             }
             if (sort.equals(EventSort.EVENT_DATE)) {
                 List<EventShortDto> dtos = events.stream()
-                        .peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L)))
-                        .peek(eventRepository::save)
                         .sorted(Comparator.comparing(Event::getEventDate))
                         .map(EventMapper::toEventShortDto)
                         .collect(Collectors.toList());
@@ -344,10 +338,10 @@ public class EventServiceImpl implements EventService {
             addHitToStats(httpRequest);
             Map<Long, Long> views = getViewsFromStats(events);
             log.info("VIEWS:" + views);
+            events = events.stream().peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L))).collect(Collectors.toList());
+            eventRepository.saveAll(events);
             if (sort == null) {
                 List<EventShortDto> dtos = events.stream()
-                        .peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L)))
-                        .peek(eventRepository::save)
                         .map(EventMapper::toEventShortDto)
                         .collect(Collectors.toList());
                 log.info("dtos.size() =" + dtos.size() + ". First:" + dtos.get(0));
@@ -355,8 +349,6 @@ public class EventServiceImpl implements EventService {
             }
             if (sort.equals(EventSort.VIEWS)) {
                 List<EventShortDto> dtos = events.stream()
-                        .peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L)))
-                        .peek(eventRepository::save)
                         .sorted(Comparator.comparing(Event::getViews))
                         .map(EventMapper::toEventShortDto)
                         .collect(Collectors.toList());
@@ -365,8 +357,6 @@ public class EventServiceImpl implements EventService {
             }
             if (sort.equals(EventSort.EVENT_DATE)) {
                 List<EventShortDto> dtos = events.stream()
-                        .peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L)))
-                        .peek(eventRepository::save)
                         .sorted(Comparator.comparing(Event::getEventDate))
                         .map(EventMapper::toEventShortDto)
                         .collect(Collectors.toList());
@@ -425,7 +415,7 @@ public class EventServiceImpl implements EventService {
         List<Long> ids = events.stream().map(Event::getId).collect(Collectors.toList());
         String eventsUri = "/events/";
         String[] uris = ids.stream().map(id -> eventsUri + id).toArray(String[]::new);
-        ResponseEntity<Object> objects = statsClient.getStats(DEFAULT_START_SEARCH_TIME, DEFAULT_END_SEARCH_TIME, uris, true);
+        ResponseEntity<Object> objects = statsClient.getStats(LocalDateTime.now().minusYears(50), LocalDateTime.now().plusYears(1000), uris, true);
         List<ViewStatsDto> viewStatsDtoList = objectMapper.convertValue(objects.getBody(), new TypeReference<List<ViewStatsDto>>() {
         });
         Map<Long, Long> views = new HashMap<>();
