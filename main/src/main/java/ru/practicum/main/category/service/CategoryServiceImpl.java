@@ -48,13 +48,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto update(Long catId, NewCategoryDto newCategoryDto) {
+    public CategoryDto update(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId).orElseThrow(() ->
                 new NotFoundException("Категория с id" + catId + "не найдена в базе данных"));
-        if (!newCategoryDto.getName().equals(category.getName())) {
-            checkName(newCategoryDto.getName());
+        if (categoryDto.getName() != null) {
+            checkName(categoryDto.getName());
+            category.setName(categoryDto.getName());
         }
-        category.setName(newCategoryDto.getName());
         Category updCategory = categoryRepository.save(category);
         return toCategoryDto(updCategory);
     }

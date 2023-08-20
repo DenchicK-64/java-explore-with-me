@@ -20,7 +20,7 @@ public class PublicCompilationController {
     private final CompilationService compilationService;
 
     @GetMapping
-    public List<CompilationDto> findAll(@RequestParam(defaultValue = "false") Boolean pinned,
+    public List<CompilationDto> findAll(@RequestParam(required = false) Boolean pinned,
                                         @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") int from,
                                         @Positive @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получение всех подборок");
