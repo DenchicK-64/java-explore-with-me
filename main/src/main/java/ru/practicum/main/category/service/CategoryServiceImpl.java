@@ -31,7 +31,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto create(NewCategoryDto newCategoryDto) {
-        checkName(newCategoryDto.getName());
         Category category = toCategory(newCategoryDto);
         Category newCategory = categoryRepository.save(category);
         return toCategoryDto(newCategory);
@@ -51,8 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto update(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId).orElseThrow(() ->
                 new NotFoundException("Категория с id" + catId + "не найдена в базе данных"));
-        if (categoryDto != null && !categoryDto.getName().equals(category.getName())) {
-            checkName(categoryDto.getName());
+        if (categoryDto.getName() != null) {
             category.setName(categoryDto.getName());
         }
         Category updCategory = categoryRepository.save(category);
@@ -70,12 +68,5 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(catId).orElseThrow(() ->
                 new NotFoundException("Категория с id" + catId + "не найден в базе данных"));
         return toCategoryDto(category);
-    }
-
-    private void checkName(String name) {
-        Category category = categoryRepository.findByName(name);
-        if (category != null) {
-            throw new DataConflictException("Название категории уже используется");
-        }
     }
 }

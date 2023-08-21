@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.main.exceptions.DataConflictException;
 import ru.practicum.main.user.dto.UserDto;
 import ru.practicum.main.user.mapper.UserMapper;
 import ru.practicum.main.user.model.User;
@@ -27,7 +26,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(UserDto userDto) {
-        checkName(userDto.getName());
         User user = toUser(userDto);
         User newUser = userRepository.save(user);
         return toUserDto(newUser);
@@ -45,12 +43,6 @@ public class UserServiceImpl implements UserService {
             return userRepository.findAll(pageRequest).stream().map(UserMapper::toUserDto).collect(Collectors.toList());
         } else {
             return userRepository.findAllById(ids).stream().map(UserMapper::toUserDto).collect(Collectors.toList());
-        }
-    }
-
-    private void checkName(String name) {
-        if (userRepository.existsByName(name)) {
-            throw new DataConflictException("Имя пользоваиеля уже используется");
         }
     }
 }
