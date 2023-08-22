@@ -3,6 +3,7 @@ package ru.practicum.server.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
@@ -19,6 +20,7 @@ public class StatsController {
     private final StatsService statsService;
 
     @PostMapping("/hit")
+    @ResponseStatus(HttpStatus.CREATED)
     public EndpointHitDto create(@RequestBody @Valid EndpointHitDto endpointHitDto) {
         log.info("Сохранение информации о том, что на uri = " + endpointHitDto.getUri() + " был отправлен запрос пользователем. " +
                 "Название сервиса = " + endpointHitDto.getApp() + ", ip пользователя = " + endpointHitDto.getIp() +
@@ -27,9 +29,10 @@ public class StatsController {
     }
 
     @GetMapping("/stats")
+    @ResponseStatus(HttpStatus.OK)
     public List<ViewStatsDto> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
                                        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
-                                       @RequestParam(required = false) List<String> uris,
+                                       @RequestParam(required = false) String[] uris,
                                        @RequestParam(defaultValue = "false") boolean unique) {
         log.info("Получение статистики по посещениям." +
                 " Дата и впемя начала диапозона, за который нужно выгрузить статистику = " + start +
