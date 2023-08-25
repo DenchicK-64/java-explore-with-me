@@ -78,7 +78,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentShortDto> findAllByAuthor(Long userId, Integer from, Integer size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdOn");
-        PageRequest pageRequest = PageRequest.of(from/size, size, sort);
+        PageRequest pageRequest = PageRequest.of(from / size, size, sort);
         List<Comment> comments = commentRepository.findAllByAuthorId(userId, pageRequest);
         List<CommentShortDto> dtos = comments.stream()
                 .map(CommentMapper::toCommentShortDto)
@@ -126,7 +126,7 @@ public class CommentServiceImpl implements CommentService {
         }
         List<Comment> comments;
         Sort sort = Sort.by(Sort.Direction.DESC, "createdOn");
-        PageRequest pageRequest = PageRequest.of(from/size, size, sort);
+        PageRequest pageRequest = PageRequest.of(from / size, size, sort);
         if (eventId == null) {
             comments = commentRepository.findAll(pageRequest).toList();
         }
