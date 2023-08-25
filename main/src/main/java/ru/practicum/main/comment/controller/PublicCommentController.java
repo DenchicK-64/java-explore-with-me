@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.main.comment.dto.CommentDto;
 import ru.practicum.main.comment.dto.CommentShortDto;
 import ru.practicum.main.comment.service.CommentService;
 
@@ -16,15 +17,22 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/events/{eventId}/comments")
+@RequestMapping(path = "/comments")
 @Validated
 @RequiredArgsConstructor
 public class PublicCommentController {
     private final CommentService commentService;
 
+    @GetMapping("/{commId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CommentDto getByIdByPublicUser(@PathVariable Long commId) {
+        log.debug("Запрос публичным пользователем комментария с id=" + commId);
+        return commentService.getByIdByPublicUser(commId);
+    }
+
     @GetMapping
-    @ResponseStatus(value = HttpStatus.OK)
-    public List<CommentShortDto> findAllByPublicUser(@PathVariable Long eventId,
+    @ResponseStatus(HttpStatus.OK)
+    public List<CommentShortDto> findAllByPublicUser(@RequestParam(required = false) Long eventId,
                                                      @RequestParam(required = false)
                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
                                                      @RequestParam(required = false)

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.main.comment.dto.CommentDto;
 import ru.practicum.main.comment.dto.CommentShortDto;
 import ru.practicum.main.comment.dto.NewCommentDto;
+import ru.practicum.main.comment.dto.UpdateCommentRequest;
 import ru.practicum.main.comment.mapper.CommentMapper;
 import ru.practicum.main.comment.model.Comment;
 import ru.practicum.main.comment.repository.CommentRepository;
@@ -38,9 +39,10 @@ public class CommentServiceImpl implements CommentService {
     //PRIVATE
 
     @Override
-    public CommentDto createByAuthor(Long userId, Long eventId, NewCommentDto newCommentDto) {
+    public CommentDto createByAuthor(Long userId, NewCommentDto newCommentDto) {
         User author = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id " + userId + " не найден в базе данных"));
+        Long eventId = newCommentDto.getEventId();
         Event event = eventRepository.findById(eventId).orElseThrow(() ->
                 new NotFoundException("Событие с id " + eventId + " не найдено в базе данных"));
         Comment comment = toComment(newCommentDto, author, event);
@@ -51,10 +53,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto updateByAuthor(Long userId, Long commId, CommentDto commentDto) {
+    public CommentDto updateByAuthor(Long userId, Long commId, UpdateCommentRequest updateCommentRequest) {
         Comment comment = checkComment(commId, userId);
-        if (commentDto.getText() != null) {
-            comment.setText(commentDto.getText());
+        if (updateCommentRequest.getText() != null) {
+            comment.setText(updateCommentRequest.getText());
         }
         comment.setUpdatedOn(LocalDateTime.now());
         Comment updComment = commentRepository.save(comment);
@@ -74,20 +76,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentShortDto> findAllByAuthor(Long userId, /*String text, List<Long> events, */LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                                 Integer from, Integer size) {
-        if ((rangeStart != null && rangeEnd != null) && (rangeEnd.isBefore(rangeStart) || rangeStart.isAfter(rangeEnd))) {
-            throw new ValidationException("Дата конца периода поиска не может быть раньше даты начала поиска и дата начала периода" +
-                    "поиска не может быть позже даты конца периода поиска");
-        }
+    public List<CommentShortDto> findAllByAuthor(Long userId, Integer from, Integer size) {
         PageRequest pageRequest = PageRequest.of(from, size);
-        if (rangeStart == null) {
-            rangeStart = LocalDateTime.now().minusYears(20);
-        }
-        if (rangeEnd == null) {
-            rangeEnd = LocalDateTime.now();
-        }
-        List<Comment> comments = commentRepository.findAllByAuthor(userId, /*text, events, */rangeStart, rangeEnd, pageRequest);
+        List<Comment> comments = commentRepository.findAllByAuthorId(userId, pageRequest);
         List<CommentShortDto> dtos = comments.stream()
                 .sorted(Comparator.comparing(Comment::getCreatedOn))
                 .map(CommentMapper::toCommentShortDto)
@@ -99,11 +90,11 @@ public class CommentServiceImpl implements CommentService {
     //ADMIN
 
     @Override
-    public CommentDto updateByAdmin(Long commId, CommentDto commentDto) {
+    public CommentDto updateByAdmin(Long commId, UpdateCommentRequest updateCommentRequest) {
         Comment comment = commentRepository.findById(commId).orElseThrow(() ->
                 new NotFoundException("Комментарий с id " + commId + " не найден в базе данных"));
-        if (commentDto.getText() != null) {
-            comment.setText(commentDto.getText());
+        if (updateCommentRequest.getText() != null) {
+            comment.setText(updateCommentRequest.getText());
         }
         comment.setUpdatedOn(LocalDateTime.now());
         Comment updComment = commentRepository.save(comment);
@@ -117,37 +108,15 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.delete(comment);
     }
 
+    //PUBLIC
+
     @Override
-    public CommentDto getByIdByAdmin(Long commId) {
+    public CommentDto getByIdByPublicUser(Long commId) {
         Comment comment = commentRepository.findById(commId).orElseThrow(() ->
                 new NotFoundException("Комментарий с id " + commId + " не найден в базе данных"));
         return toCommentDto(comment);
     }
 
-    @Override
-    public List<CommentDto> findAllByAdmin(String text, List<Long> events, List<Long> users,
-                                           LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
-        if ((rangeStart != null && rangeEnd != null) && (rangeEnd.isBefore(rangeStart) || rangeStart.isAfter(rangeEnd))) {
-            throw new ValidationException("Дата конца периода поиска не может быть раньше даты начала поиска и дата начала периода" +
-                    "поиска не может быть позже даты конца периода поиска");
-        }
-        PageRequest pageRequest = PageRequest.of(from, size);
-        if (rangeStart == null) {
-            rangeStart = LocalDateTime.now().minusYears(20);
-        }
-        if (rangeEnd == null) {
-            rangeEnd = LocalDateTime.now();
-        }
-        List<Comment> comments = commentRepository.findAllByAdmin(text, events, users, rangeStart, rangeEnd, pageRequest);
-        List<CommentDto> dtos = comments.stream()
-                .sorted(Comparator.comparing(Comment::getCreatedOn))
-                .map(CommentMapper::toCommentDto)
-                .collect(Collectors.toList());
-        log.info("findAllByAuthor, dtos = : " + dtos.size());
-        return dtos;
-    }
-
-    //PUBLIC
     @Override
     public List<CommentShortDto> findAllByPublicUser(Long eventId, LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                                      Integer from, Integer size) {
@@ -155,14 +124,15 @@ public class CommentServiceImpl implements CommentService {
             throw new ValidationException("Дата конца периода поиска не может быть раньше даты начала поиска и дата начала периода" +
                     "поиска не может быть позже даты конца периода поиска");
         }
+        List<Comment> comments;
         PageRequest pageRequest = PageRequest.of(from, size);
-        if (rangeStart == null) {
-            rangeStart = LocalDateTime.now().minusYears(20);
+        if (eventId == null) {
+            comments = commentRepository.findAll(pageRequest).toList();
         }
-        if (rangeEnd == null) {
-            rangeEnd = LocalDateTime.now();
+        if ((rangeStart == null) && (rangeEnd == null)) {
+            comments = commentRepository.findAllByEventId(eventId, pageRequest);
         }
-        List<Comment> comments = commentRepository.findAllByPublicUser(eventId, rangeStart, rangeEnd, pageRequest);
+        comments = commentRepository.findAllByPublicUser(eventId, rangeStart, rangeEnd, pageRequest);
         List<CommentShortDto> dtos = comments.stream()
                 .sorted(Comparator.comparing(Comment::getCreatedOn))
                 .map(CommentMapper::toCommentShortDto)

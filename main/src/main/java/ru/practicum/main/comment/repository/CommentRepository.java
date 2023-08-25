@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.main.comment.model.Comment;
+import ru.practicum.main.comment.model.CommentCounter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,30 +13,21 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Comment findByIdAndAuthorId(Long commId, Long userId);
 
-    @Query("SELECT c FROM Comment c WHERE (c.author.id = :userId) AND " +
-            "(c.createdOn BETWEEN :rangeStart AND :rangeEnd)")
-    List<Comment> findAllByAuthor(@Param("userId") Long userId,
-                                  @Param("rangeStart") LocalDateTime rangeStart,
-                                  @Param("rangeEnd") LocalDateTime rangeEnd,
-                                  PageRequest pageRequest);
+    List<Comment> findAllByEventId(Long eventId, PageRequest pageRequest);
 
-    @Query("SELECT c FROM Comment c WHERE " +
-            "(lower(c.text) LIKE lower(concat('%', :text, '%')) OR :text IS NULL) AND " +
-            "(c.event.id IN :events OR :events IS NULL) AND " +
-            "(c.author.id IN :users OR :users IS NULL) AND " +
-            "(c.createdOn BETWEEN :rangeStart AND :rangeEnd)")
-    List<Comment> findAllByAdmin(@Param("text") String text,
-                                 @Param("events") List<Long> events,
-                                 @Param("users") List<Long> users,
-                                 @Param("rangeStart") LocalDateTime rangeStart,
-                                 @Param("rangeEnd") LocalDateTime rangeEnd,
-                                 PageRequest pageRequest);
+    List<Comment> findAllByAuthorId(Long userId, PageRequest pageRequest);
 
     @Query("SELECT c FROM Comment c " +
-            "WHERE (c.event.id = :eventId) " +
+            "WHERE (c.event.id = :eventId OR :eventId IS NULL) " +
             "AND (c.createdOn BETWEEN :rangeStart AND :rangeEnd)")
     List<Comment> findAllByPublicUser(@Param("eventId") Long eventId,
                                       @Param("rangeStart") LocalDateTime rangeStart,
                                       @Param("rangeEnd") LocalDateTime rangeEnd,
                                       PageRequest pageRequest);
+
+    @Query("SELECT new ru.practicum.main.comment.model.CommentCounter(c.event.id, COUNT (c.id)) " +
+            "FROM Comment c " +
+            "WHERE (c.event.id IN :ids) " +
+            "GROUP BY c.event.id")
+    List<CommentCounter> findNumberAllCommentsByEventId(List<Long> ids);
 }

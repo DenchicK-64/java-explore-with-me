@@ -399,10 +399,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"text\": \"Тест\"\r\n}"
+							"raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"Тест\"\r\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments?eventId=1",
+							"raw": "{{baseUrl}}/users/:userId/comments",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -410,12 +410,6 @@
 								"users",
 								":userId",
 								"comments"
-							],
-							"query": [
-								{
-									"key": "eventId",
-									"value": "1"
-								}
 							],
 							"variable": [
 								{
@@ -479,10 +473,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"text\": \"Комментарий пользователя 2\"\r\n}"
+							"raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"Комментарий пользователя 2\"\r\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments?eventId=1",
+							"raw": "{{baseUrl}}/users/:userId/comments",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -490,12 +484,6 @@
 								"users",
 								":userId",
 								"comments"
-							],
-							"query": [
-								{
-									"key": "eventId",
-									"value": "1"
-								}
 							],
 							"variable": [
 								{
@@ -602,10 +590,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"text\": \"Комментарий пользователя 2\"\r\n}"
+							"raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"Комментарий пользователя 2\"\r\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/2/comments?eventId=1",
+							"raw": "{{baseUrl}}/users/2/comments",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -613,12 +601,6 @@
 								"users",
 								"2",
 								"comments"
-							],
-							"query": [
-								{
-									"key": "eventId",
-									"value": "1"
-								}
 							]
 						}
 					},
@@ -676,10 +658,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"text\": \"Слово для поиска - Кандибобер\"\r\n}"
+							"raw": "{\r\n    \"eventId\": \"2\",\r\n    \"text\": \"Слово для поиска - Кандибобер\"\r\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/2/comments?eventId=2",
+							"raw": "{{baseUrl}}/users/2/comments",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -687,12 +669,6 @@
 								"users",
 								"2",
 								"comments"
-							],
-							"query": [
-								{
-									"key": "eventId",
-									"value": "2"
-								}
 							]
 						}
 					},
@@ -961,6 +937,9 @@
 							}
 						}
 					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [
@@ -975,6 +954,10 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{baseUrl}}/users/:userId/comments",
 							"host": [
@@ -1070,7 +1053,7 @@
 					"response": []
 				},
 				{
-					"name": "Запрос админом комментария 3",
+					"name": "Запрос публичным пользователем комментария 1",
 					"event": [
 						{
 							"listen": "test",
@@ -1115,170 +1098,19 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/admin/comments/:commId",
+							"raw": "{{baseUrl}}/comments/:commId",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"admin",
 								"comments",
 								":commId"
 							],
 							"variable": [
 								{
 									"key": "commId",
-									"value": "3"
+									"value": "1"
 								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Получение админом всех комментариев",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"    pm.response.to.be.withBody;\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Возвращаемое значение - список и он состоит из 2 элементов\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"\tpm.expect(jsonData).is.an('array');\r",
-									"\tpm.expect(jsonData.length, 'Длина списка - 2').to.be.greaterThan(0);\r",
-									"});\r",
-									"\r",
-									"const target = pm.response.json()[0];\r",
-									"pm.test(\"Комментарий должен содержать поля: id, text, author, event, createdOn\", function () {\r",
-									"pm.expect(target).to.have.property('id');\r",
-									"pm.expect(target).to.have.property('text');\r",
-									"pm.expect(target).to.have.property('author');\r",
-									"pm.expect(target).to.have.property('event');\r",
-									"pm.expect(target).to.have.property('createdOn');\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/admin/comments/?text=кандибобер&events=2&users=2&rangeStart=2022-07-07%2013%3A30%3A38&rangeEnd=2999-02-02%2013%3A30%3A38&from=0&size=100",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"admin",
-								"comments",
-								""
-							],
-							"query": [
-								{
-									"key": "text",
-									"value": "кандибобер"
-								},
-								{
-									"key": "events",
-									"value": "2"
-								},
-								{
-									"key": "users",
-									"value": "2"
-								},
-								{
-									"key": "rangeStart",
-									"value": "2022-07-07%2013%3A30%3A38"
-								},
-								{
-									"key": "rangeEnd",
-									"value": "2999-02-02%2013%3A30%3A38"
-								},
-								{
-									"key": "from",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "100"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Получение админом всех комментариев  без необязательных параметров запроса",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"    pm.response.to.be.withBody;\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Возвращаемое значение - список и он состоит из 3 элементов\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"\tpm.expect(jsonData).is.an('array');\r",
-									"\tpm.expect(jsonData.length, 'Длина списка - 3').to.be.equal(3);\r",
-									"});\r",
-									"\r",
-									"const target = pm.response.json()[0];\r",
-									"pm.test(\"Комментарий должен содержать поля: id, text, author, event, createdOn\", function () {\r",
-									"pm.expect(target).to.have.property('id');\r",
-									"pm.expect(target).to.have.property('text');\r",
-									"pm.expect(target).to.have.property('author');\r",
-									"pm.expect(target).to.have.property('event');\r",
-									"pm.expect(target).to.have.property('createdOn');\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/admin/comments/",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"admin",
-								"comments",
-								""
 							]
 						}
 					},
@@ -1297,10 +1129,10 @@
 									"    pm.response.to.be.json;\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Возвращаемое значение - список и он состоит из 3 элементов\", function () {\r",
+									"pm.test(\"Возвращаемое значение - список и он состоит из 2 элементов\", function () {\r",
 									"    var jsonData = pm.response.json();\r",
 									"\tpm.expect(jsonData).is.an('array');\r",
-									"\tpm.expect(jsonData.length, 'Длина списка - 3').to.be.greaterThan(0);\r",
+									"\tpm.expect(jsonData.length, 'Длина списка - 2').to.be.equal(2);\r",
 									"});\r",
 									"\r",
 									"const target = pm.response.json()[0];\r",
@@ -1330,16 +1162,18 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/events/:eventId/comments?rangeStart=2023-01-01%2013%3A30%3A38&rangeEnd=2099-01-01%2013%3A30%3A38&from=0&size=120",
+							"raw": "{{baseUrl}}/comments?eventId=1&rangeStart=2023-01-01%2013%3A30%3A38&rangeEnd=2099-01-01%2013%3A30%3A38&from=0&size=120",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"events",
-								":eventId",
 								"comments"
 							],
 							"query": [
+								{
+									"key": "eventId",
+									"value": "1"
+								},
 								{
 									"key": "rangeStart",
 									"value": "2023-01-01%2013%3A30%3A38"
@@ -1355,12 +1189,6 @@
 								{
 									"key": "size",
 									"value": "120"
-								}
-							],
-							"variable": [
-								{
-									"key": "eventId",
-									"value": "1"
 								}
 							]
 						}
@@ -1380,10 +1208,10 @@
 									"    pm.response.to.be.json;\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Возвращаемое значение - список и он состоит из 1 элемента\", function () {\r",
+									"pm.test(\"Возвращаемое значение - список и он состоит из 3 элементов\", function () {\r",
 									"    var jsonData = pm.response.json();\r",
 									"\tpm.expect(jsonData).is.an('array');\r",
-									"\tpm.expect(jsonData.length, 'Длина списка не равна 0').to.be.equal(1);\r",
+									"\tpm.expect(jsonData.length, 'Длина списка не равна 0').to.be.equal(3);\r",
 									"});\r",
 									"\r",
 									"const target = pm.response.json()[0];\r",
@@ -1413,25 +1241,26 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/events/:eventId/comments",
+							"raw": "{{baseUrl}}/comments?rangeStart=2023-01-01%2013%3A30%3A38&rangeEnd=2099-01-01%2013%3A30%3A38",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"events",
-								":eventId",
 								"comments"
 							],
 							"query": [
 								{
-									"key": "rangeStart",
-									"value": "2023-01-01%2013%3A30%3A38",
+									"key": "eventId",
+									"value": "1",
 									"disabled": true
 								},
 								{
+									"key": "rangeStart",
+									"value": "2023-01-01%2013%3A30%3A38"
+								},
+								{
 									"key": "rangeEnd",
-									"value": "2099-01-01%2013%3A30%3A38",
-									"disabled": true
+									"value": "2099-01-01%2013%3A30%3A38"
 								},
 								{
 									"key": "from",
@@ -1442,12 +1271,6 @@
 									"key": "size",
 									"value": "120",
 									"disabled": true
-								}
-							],
-							"variable": [
-								{
-									"key": "eventId",
-									"value": "2"
 								}
 							]
 						}
@@ -1486,6 +1309,219 @@
 								{
 									"key": "commId",
 									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "События",
+			"item": [
+				{
+					"name": "Запрос инициатором события 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+									"    pm.response.to.be.ok;    \r",
+									"    pm.response.to.be.withBody;\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"const source = pm.collectionVariables.get('response');\r",
+									"const target = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, initiator, views, confirmedRequests, description, participantLimit, state, createdOn, publishedOn, location, requestModeration\", function () {\r",
+									"pm.expect(target).to.have.property('id');\r",
+									"pm.expect(target).to.have.property('title');\r",
+									"pm.expect(target).to.have.property('annotation');\r",
+									"pm.expect(target).to.have.property('category');\r",
+									"pm.expect(target).to.have.property('paid');\r",
+									"pm.expect(target).to.have.property('eventDate');\r",
+									"pm.expect(target).to.have.property('initiator');\r",
+									"pm.expect(target).to.have.property('views');\r",
+									"pm.expect(target).to.have.property('confirmedRequests');\r",
+									"pm.expect(target).to.have.property('description');\r",
+									"pm.expect(target).to.have.property('participantLimit');\r",
+									"pm.expect(target).to.have.property('state');\r",
+									"pm.expect(target).to.have.property('createdOn');\r",
+									"pm.expect(target).to.have.property('publishedOn');\r",
+									"pm.expect(target).to.have.property('location');\r",
+									"pm.expect(target).to.have.property('requestModeration');\r",
+									"pm.expect(target).to.have.property('numberOfComments');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Количество комментариев - 2\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('numberOfComments');\r",
+									"    pm.expect(jsonData.id, '\"numberOfComments\" = 2').to.eql(2);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/:userId/events/:eventId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"events",
+								":eventId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "2"
+								},
+								{
+									"key": "eventId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Запрос инициатором всех своих событий",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+									"    pm.response.to.be.ok;    \r",
+									"    pm.response.to.be.withBody;\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"const target = pm.response.json()[0];\r",
+									"\r",
+									"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDateб numberOfComments\", function () {\r",
+									"    pm.expect(target).to.contain.keys('id', 'title', 'annotation', 'category', 'paid', 'eventDate', 'numberOfComments');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+									"    pm.expect(target.id).to.not.be.null;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Количество комментариев - 1\", function () {\r",
+									"    pm.expect(target).to.have.property('numberOfComments');\r",
+									"    pm.expect(target.id, '\"numberOfComments\" = 1').to.eql(1);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/:userId/events/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"events",
+								""
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Запрос админом всех событий",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+									"    pm.response.to.be.ok;    \r",
+									"    pm.response.to.be.withBody;\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"const target = pm.response.json()[0];\r",
+									"\r",
+									"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDateб numberOfComments\", function () {\r",
+									"    pm.expect(target).to.contain.keys('id', 'title', 'annotation', 'category', 'paid', 'eventDate', 'numberOfComments');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+									"    pm.expect(target.id).to.not.be.null;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Количество комментариев - 1\", function () {\r",
+									"    pm.expect(target).to.have.property('numberOfComments');\r",
+									"    pm.expect(target.id, '\"numberOfComments\" = 1').to.eql(1);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/events?users=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"events"
+							],
+							"query": [
+								{
+									"key": "users",
+									"value": "1"
 								}
 							]
 						}
@@ -1639,10 +1675,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"text\": \"текст\"\r\n}"
+							"raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"текст\"\r\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments?eventId=1",
+							"raw": "{{baseUrl}}/users/:userId/comments",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1650,12 +1686,6 @@
 								"users",
 								":userId",
 								"comments"
-							],
-							"query": [
-								{
-									"key": "eventId",
-									"value": "1"
-								}
 							],
 							"variable": [
 								{
@@ -1698,10 +1728,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id\": 1,\r\n    \"text\": \"Поскорее бы закончить с тестами...\",\r\n    \"author\": {\r\n        \"id\": 1,\r\n        \"name\": \"user\"\r\n    },\r\n    \"event\": {\r\n        \"annotation\": \"В рамках теста можно также проверить содержимое данных в формате JSON. Для этого нужно сначала конвертировать тело ответа с помощью метода json(), после чего проверить различные утверждения. Например, что полученный JSON является массивом.\",\r\n        \"category\": {\r\n            \"id\": 1,\r\n            \"name\": \"Просто категория\"\r\n        },\r\n        \"confirmedRequests\": 0,\r\n        \"eventDate\": \"2024-01-23 09:24:08\",\r\n        \"id\": 1,\r\n        \"initiator\": {\r\n            \"id\": 1,\r\n            \"name\": \"user\"\r\n        },\r\n        \"paid\": true,\r\n        \"title\": \"Repudiandae sint occaecati rerum sint.\",\r\n        \"views\": null\r\n    },\r\n    \"createdOn\": \"2023-08-23 15:21:24\"\r\n}"
+							"raw": "{\r\n    \"eventId\": \"2000\",\r\n    \"text\": \"текст\"\r\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/2/comments?eventId=2000",
+							"raw": "{{baseUrl}}/users/2/comments",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1709,12 +1739,6 @@
 								"users",
 								"2",
 								"comments"
-							],
-							"query": [
-								{
-									"key": "eventId",
-									"value": "2000"
-								}
 							]
 						}
 					},
@@ -1934,7 +1958,7 @@
 					"response": []
 				},
 				{
-					"name": "Попытка получить полную информацию о комментарии пользователем, не являющимся его автором",
+					"name": "Попытка публичного пользователя получить несуществующий комментарий",
 					"event": [
 						{
 							"listen": "test",
@@ -1963,93 +1987,18 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments/:commId",
+							"raw": "{{baseUrl}}/comments/:commId",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"users",
-								":userId",
 								"comments",
 								":commId"
 							],
 							"variable": [
 								{
-									"key": "userId",
-									"value": "1"
-								},
-								{
 									"key": "commId",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Попытка получения всех комментариев пользователя c датой начала периода поиска позже даты конца периода поиска",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
-									"    pm.response.to.have.status(400);\r",
-									"    pm.response.to.be.withBody;\r",
-									"    pm.response.to.be.json;\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments?rangeStart=2223-01-01%2013%3A30%3A38&rangeEnd=2100-01-01%2013%3A30%3A38&from=0&size=100",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"users",
-								":userId",
-								"comments"
-							],
-							"query": [
-								{
-									"key": "rangeStart",
-									"value": "2223-01-01%2013%3A30%3A38"
-								},
-								{
-									"key": "rangeEnd",
-									"value": "2100-01-01%2013%3A30%3A38"
-								},
-								{
-									"key": "from",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "100"
-								}
-							],
-							"variable": [
-								{
-									"key": "userId",
-									"value": "2"
+									"value": "1000"
 								}
 							]
 						}
@@ -2110,136 +2059,6 @@
 					"response": []
 				},
 				{
-					"name": "Попытка админа получить несуществующий комментарий",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 404\", function () {\r",
-									"    pm.expect(pm.response.code).to.be.oneOf([404]);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/admin/comments/:commId",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"admin",
-								"comments",
-								":commId"
-							],
-							"variable": [
-								{
-									"key": "commId",
-									"value": "1001"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Попытка админа получить все комментарии c датой начала периода поиска позже даты конца периода поиска",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
-									"    pm.response.to.have.status(400);\r",
-									"    pm.response.to.be.withBody;\r",
-									"    pm.response.to.be.json;\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments?text=кандибобер&events=2&users=2&rangeStart=2223-01-01%2013%3A30%3A38&rangeEnd=2100-01-01%2013%3A30%3A38&from=0&size=100",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"users",
-								":userId",
-								"comments"
-							],
-							"query": [
-								{
-									"key": "text",
-									"value": "кандибобер"
-								},
-								{
-									"key": "events",
-									"value": "2"
-								},
-								{
-									"key": "users",
-									"value": "2"
-								},
-								{
-									"key": "rangeStart",
-									"value": "2223-01-01%2013%3A30%3A38"
-								},
-								{
-									"key": "rangeEnd",
-									"value": "2100-01-01%2013%3A30%3A38"
-								},
-								{
-									"key": "from",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "100"
-								}
-							],
-							"variable": [
-								{
-									"key": "userId",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Попытка публичного пользователя получить все комментарии c датой начала периода поиска позже даты конца периода поиска",
 					"event": [
 						{
@@ -2271,16 +2090,18 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/events/:eventId/comments?rangeStart=2223-01-01%2013%3A30%3A38&rangeEnd=2100-01-01%2013%3A30%3A38&from=0&size=100",
+							"raw": "{{baseUrl}}/comments?eventId=2&rangeStart=2223-01-01%2013%3A30%3A38&rangeEnd=2100-01-01%2013%3A30%3A38&from=0&size=100",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"events",
-								":eventId",
 								"comments"
 							],
 							"query": [
+								{
+									"key": "eventId",
+									"value": "2"
+								},
 								{
 									"key": "rangeStart",
 									"value": "2223-01-01%2013%3A30%3A38"
@@ -2296,12 +2117,6 @@
 								{
 									"key": "size",
 									"value": "100"
-								}
-							],
-							"variable": [
-								{
-									"key": "eventId",
-									"value": "2"
 								}
 							]
 						}
