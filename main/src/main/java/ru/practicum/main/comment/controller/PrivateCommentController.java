@@ -32,7 +32,8 @@ public class PrivateCommentController {
     }
 
     @PatchMapping("/{commId}")
-    public CommentDto updateByAuthor(@PathVariable Long userId, @PathVariable Long commId, @RequestBody UpdateCommentRequest updateCommentRequest) {
+    public CommentDto updateByAuthor(@PathVariable Long userId, @PathVariable Long commId,
+                                     @RequestBody @Valid UpdateCommentRequest updateCommentRequest) {
         log.info("Кoмментарий с id=" + commId + " изменён автором с id=" + userId + ". Текст: " + updateCommentRequest.getText());
         return commentService.updateByAuthor(userId, commId, updateCommentRequest);
     }

@@ -3,6 +3,7 @@ package ru.practicum.main.comment.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.main.comment.dto.CommentDto;
 import ru.practicum.main.comment.dto.CommentShortDto;
@@ -20,7 +21,6 @@ import ru.practicum.main.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,13 +77,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentShortDto> findAllByAuthor(Long userId, Integer from, Integer size) {
-        PageRequest pageRequest = PageRequest.of(from, size);
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdOn");
+        PageRequest pageRequest = PageRequest.of(from/size, size, sort);
         List<Comment> comments = commentRepository.findAllByAuthorId(userId, pageRequest);
         List<CommentShortDto> dtos = comments.stream()
-                .sorted(Comparator.comparing(Comment::getCreatedOn))
                 .map(CommentMapper::toCommentShortDto)
                 .collect(Collectors.toList());
-        log.info("findAllByAuthor, dtos = : " + dtos.size());
+        log.info("findAllByAuthor, dtos = : " + dtos.size() + ". Created on: " + dtos.get(0).getCreatedOn() + ", " + dtos.get(1).getCreatedOn());
         return dtos;
     }
 
@@ -125,7 +125,8 @@ public class CommentServiceImpl implements CommentService {
                     "поиска не может быть позже даты конца периода поиска");
         }
         List<Comment> comments;
-        PageRequest pageRequest = PageRequest.of(from, size);
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdOn");
+        PageRequest pageRequest = PageRequest.of(from/size, size, sort);
         if (eventId == null) {
             comments = commentRepository.findAll(pageRequest).toList();
         }
@@ -134,10 +135,9 @@ public class CommentServiceImpl implements CommentService {
         }
         comments = commentRepository.findAllByPublicUser(eventId, rangeStart, rangeEnd, pageRequest);
         List<CommentShortDto> dtos = comments.stream()
-                .sorted(Comparator.comparing(Comment::getCreatedOn))
                 .map(CommentMapper::toCommentShortDto)
                 .collect(Collectors.toList());
-        log.info("findAllByAuthor, dtos = : " + dtos.size());
+        log.info("findAllByAuthor, dtos = : " + dtos.size() + ". Created on: " + dtos.get(0).getCreatedOn() + ", " + dtos.get(1).getCreatedOn());
         return dtos;
     }
 

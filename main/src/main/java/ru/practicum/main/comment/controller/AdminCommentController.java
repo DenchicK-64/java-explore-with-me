@@ -9,6 +9,8 @@ import ru.practicum.main.comment.dto.CommentDto;
 import ru.practicum.main.comment.dto.UpdateCommentRequest;
 import ru.practicum.main.comment.service.CommentService;
 
+import javax.validation.Valid;
+
 @Slf4j
 @RestController
 @RequestMapping(path = "/admin/comments")
@@ -18,7 +20,7 @@ public class AdminCommentController {
     private final CommentService commentService;
 
     @PatchMapping("/{commId}")
-    public CommentDto updateByAdmin(@PathVariable Long commId, @RequestBody UpdateCommentRequest updateCommentRequest) {
+    public CommentDto updateByAdmin(@PathVariable Long commId, @RequestBody @Valid UpdateCommentRequest updateCommentRequest) {
         log.info("Кoмментарий с id=" + commId + "изменён администратором. Текст: " + updateCommentRequest.getText());
         return commentService.updateByAdmin(commId, updateCommentRequest);
     }
